@@ -116,6 +116,27 @@ void inorder_tbt(t * dummy){
         temp=temp->right;
     }
 }
+template<typename t>
+void preorder(t*dummy){
+    if(dummy->left==dummy){
+        return;
+    }
+     t*temp=dummy->left;
+     while(temp!=dummy){
+        while(temp->leftchild==1){
+            cout<<temp->data<<" ";
+            temp=temp->left;
+        }
+        cout<<temp->data<<" ";
+        while(temp->rightchild==0){
+            if(temp->right==dummy){
+                break;
+            }
+            temp=temp->right;
+        }
+        temp=temp->right;
+     }
+}
 class node_tbt{
     public:
     int data;
@@ -188,8 +209,10 @@ int main(){
   node_tbt *dummy1=nullptr;
   while(true){
     cout<<"Enter your choice : \n1.Create a BST \n2.Convert BST to TBT\n";
-    cout<<"3.Get inorder traveral of converted TBT\n4.Create a TBT\n";
-    cout<<"5.Inorder traversal of TBT\n6.Exit\n";
+    cout<<"3.Inorder traveral of converted TBT\n";
+    cout<<"4.Preorder traveral of converted TBT\n";
+    cout<<"5.Create a TBT\n";
+    cout<<"6.Inorder traversal of TBT\n7.Preorder traversal of TBT\n8.Exit\n";
     cin>>choice;
     if(choice==1){
         root=create();
@@ -206,12 +229,22 @@ int main(){
         cout<<endl<<endl;
     }
     else if(choice==4){
-        dummy1=create_tbt();
+        cout<<"Preorder traversal of converted TBT : ";
+        preorder(dummy);
         cout<<endl<<endl;
     }
     else if(choice==5){
-        cout<<"Inorder traversal of converted TBT : ";
+        dummy1=create_tbt();
+        cout<<endl<<endl;
+    }
+    else if(choice==6){
+        cout<<"Inorder traversal of TBT : ";
         inorder_tbt(dummy1);
+        cout<<endl<<endl;
+    }
+    else if(choice==7){
+        cout<<"Preorder traversal of TBT : ";
+        preorder(dummy1);
         cout<<endl<<endl;
     }
     else{
