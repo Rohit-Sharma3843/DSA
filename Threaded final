@@ -1,0 +1,223 @@
+#include<iostream>
+#include<stack>
+#include<vector>
+using namespace std;
+class node_bst2tbt{
+    public:
+    int data;
+    node_bst2tbt *left,*right;
+    bool leftchild,rightchild;
+    node_bst2tbt(int data){
+        this->data=data;
+        this->left=nullptr;
+        this->right=nullptr;
+        this->leftchild=1;
+        this->rightchild=1;
+    }
+};
+void insert(node_bst2tbt *&root,int num){
+    node_bst2tbt*n=new node_bst2tbt(num);
+    if(root==nullptr){
+        root=n;
+        return;
+    }
+    node_bst2tbt *temp=root;
+    while(true){
+        if(temp->data>num){
+            if(temp->left==nullptr){
+                temp->left=n;
+                break;
+            }
+            else{
+                temp=temp->left;
+            }
+        }
+        else{
+            if(temp->right==nullptr){
+                temp->right=n;
+                break;
+            }
+            else{
+                temp=temp->right;
+            }
+        }
+    }
+}
+node_bst2tbt *create(){
+    node_bst2tbt * root=nullptr;
+    int num;
+    while(true){
+        cout<<"Enter the number you want to insert in BST or enter -1 to exit : ";
+        cin>>num;
+        if(num==-1){
+            break;
+        }
+        insert(root,num);
+    }
+    return root;
+}
+vector<node_bst2tbt*> get_inorder(node_bst2tbt*root){
+    vector<node_bst2tbt*> v;
+    if(root==nullptr){
+        return v;
+    }
+    node_bst2tbt * temp=root;
+    stack<node_bst2tbt*> s;
+    while(!s.empty() || temp!=nullptr){
+        while(temp!=nullptr){
+            s.push(temp);
+            temp=temp->left;
+        }
+        v.push_back(s.top());
+        temp=s.top()->right;
+        s.pop();
+    }
+    return v;
+}
+node_bst2tbt* convert(node_bst2tbt *&root,vector<node_bst2tbt*> &in){
+    node_bst2tbt * dummy=new node_bst2tbt(1000);
+    dummy->left=root;
+    dummy->rightchild=0;
+    dummy->right=dummy;
+    in[0]->left=dummy;
+    in[0]->leftchild=0;
+    in[in.size()-1]->right=dummy;
+    in[in.size()-1]->rightchild=0;
+    for(int i=0;i<in.size();i++){
+        if(in[i]->left==nullptr){
+            in[i]->left=in[i-1];
+            in[i]->leftchild=0;
+        }
+        if(in[i]->right==nullptr){
+            in[i]->right=in[i+1];
+            in[i]->rightchild=0;
+        }
+    }
+    return dummy;
+}
+template<typename t> 
+void inorder_tbt(t * dummy){
+    if(dummy->left==dummy){
+        return;
+    }
+    t *temp=dummy->left;
+    while(temp!=dummy){
+        while(temp->leftchild!=0){
+            temp=temp->left;
+        }
+        cout<<temp->data<<" ";
+        while(temp->rightchild!=1){
+            if(temp->right==dummy){
+                break;
+            }
+            temp=temp->right;
+            cout<<temp->data<<" ";
+        }
+        temp=temp->right;
+    }
+}
+class node_tbt{
+    public:
+    int data;
+    node_tbt*left,*right;
+    bool leftchild,rightchild;
+    node_tbt(int data){
+        this->data=data;
+        this->left=nullptr;
+        this->right=nullptr;
+        this->leftchild=0;
+        this->rightchild=0;
+    }
+};
+void insert_tbt(node_tbt *dummy,int num){
+    node_tbt *n=new node_tbt(num);
+    if(dummy->left==dummy){
+        n->left=dummy;
+        n->right=dummy;
+        dummy->leftchild=1;
+        dummy->left=n;
+        return;
+    }
+    node_tbt*temp=dummy->left;
+    while(true){
+        if(temp->data>num){
+            if(temp->leftchild==0){
+                n->left=temp->left;
+                n->right=temp;
+                temp->left=n;
+                temp->leftchild=1;
+                break;
+            }
+            else{
+                temp=temp->left;
+            }
+        }
+        else{
+            if(temp->rightchild==0){
+                n->right=temp->right;
+                n->left=temp;
+                temp->rightchild=1;
+                temp->right=n;
+                break;
+            }
+            else{
+                temp=temp->right;
+            }
+        }
+    }
+}
+node_tbt *create_tbt(){
+    node_tbt *dummy=new node_tbt(1000);
+    dummy->left=dummy;
+    dummy->right=dummy;
+    int num;
+    while(true){
+        cout<<"Enter the number you want to insert in TBT or enter -1 to exit :";
+        cin>>num;
+        if(num==-1){
+            return dummy;
+        }
+        insert_tbt(dummy,num);
+    }
+}
+int main(){
+  int choice;
+  node_bst2tbt*root;
+  vector<node_bst2tbt*> v;
+  node_bst2tbt*dummy=nullptr;
+  node_tbt *dummy1=nullptr;
+  while(true){
+    cout<<"Enter your choice : \n1.Create a BST \n2.Convert BST to TBT\n";
+    cout<<"3.Get inorder traveral of converted TBT\n4.Create a TBT\n";
+    cout<<"5.Inorder traversal of TBT\n6.Exit\n";
+    cin>>choice;
+    if(choice==1){
+        root=create();
+        v=get_inorder(root);
+        cout<<endl;
+    }
+    else if(choice==2){
+        dummy= convert(root,v);
+        cout<<endl<<endl;
+    }
+    else if(choice==3){
+        cout<<"Inorder traversal of converted TBT : ";
+        inorder_tbt(dummy);
+        cout<<endl<<endl;
+    }
+    else if(choice==4){
+        dummy1=create_tbt();
+        cout<<endl<<endl;
+    }
+    else if(choice==5){
+        cout<<"Inorder traversal of converted TBT : ";
+        inorder_tbt(dummy1);
+        cout<<endl<<endl;
+    }
+    else{
+        break;
+    }
+  }
+//   25 15 10 5 12 20 22 18 35 30 40 45 37 32 28 -1
+  return 0;
+}
