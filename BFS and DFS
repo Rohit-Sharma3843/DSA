@@ -1,0 +1,121 @@
+#include<iostream>
+#include<queue>
+#include<stack>
+#include<vector>
+using namespace std;
+class graph{
+    public:
+    vector<vector<int>> adjacency;
+    int edges;
+    int vertices;
+    void create(){
+        int edges;
+        cout<<"Enter the number of edges : ";
+        cin>>edges;
+        this->edges=edges;
+        int x,y;
+        for(int i=0;i<edges;i++){
+            cout<<"Enter the edge "<<i+1<<" in (u,v) format : ";
+            cin>>x>>y;
+            adjacency[x][y]=1;
+            adjacency[y][x]=1;
+        }
+    }
+    graph(int vertices){
+        this->vertices=vertices;
+        vector<vector<int>> v(vertices,vector<int>(vertices,0));
+        adjacency=v;
+        create();
+    }
+    void itr_dfs(){
+        vector<bool> visited(vertices,0);
+        int i;
+        for(int k=0;k<vertices;k++){
+            if(!visited[k]){
+                stack<int> s;
+                s.push(k);
+                while(!s.empty()){
+                    i=s.top();
+                    s.pop();
+                    if(!visited[i]){
+                        cout<<i<<" ";
+                        visited[i]=1;
+                        for(int j=0;j<vertices;j++){
+                            if(adjacency[i][j]==1 && !visited[j]){
+                                s.push(j);
+                            }
+                        }
+                    }
+                }   
+            }
+        }
+        cout<<endl;
+    }
+    void rec_dfs_single(int i,vector<bool> &visited){
+        cout<<i<<" ";
+        visited[i]=1;
+        for(int j=0;j<vertices;j++){
+            if(adjacency[i][j]==1 && !visited[j]){
+                rec_dfs_single(j,visited);
+            }
+        }
+    }
+    void rec_dfs() {
+        vector<bool> visited(vertices, false);
+        for (int i = 0; i < vertices; i++) {
+            if (!visited[i]) {
+                rec_dfs_single(i, visited);
+            }
+        }
+        cout << endl;
+    }
+    void bfs(){
+        vector<bool> visited(vertices,0);
+        int i;
+        for(int a=0;a<vertices;a++){
+            if(!visited[a]){
+                queue<int> q;
+                cout<<a<<" ";
+                q.push(a);
+                visited[a]=1;
+                while(!q.empty()){
+                    i=q.front();
+                    q.pop();
+                    for(int j=0;j<vertices;j++){
+                        if(!visited[j] && adjacency[i][j]==1){
+                        visited[j]=1;
+                        cout<<j<<" ";
+                        q.push(j);
+                        }
+                    }
+                }
+            }
+        }
+        cout<<endl;
+    }
+};
+int main(){
+  int x;
+  cout<<"Enter the number of vertices of graph : ";
+  cin>>x;
+  graph g(x);
+  cout<<endl;
+  for(int i=0;i<g.vertices;i++){
+    for(int j:g.adjacency[i]){
+        cout<<j<<" ";
+    }
+    cout<<endl;
+  }
+  cout<<endl;
+  cout<<"Iterative DFS of the graph : ";
+  g.itr_dfs();
+  cout<<endl;
+  cout<<"Recursive DFS of the graph : ";
+  vector<bool> visited(g.vertices,0);
+  g.rec_dfs();
+  cout<<endl;
+  cout<<"BFS of the graph : ";
+  g.bfs();
+//   7 7 0 1 0 2 1 2 3 4 3 5 3 6 5 6
+  return 0;
+}
