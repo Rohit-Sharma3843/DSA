@@ -1,0 +1,354 @@
+#include<iostream>
+#include<queue>
+#include<stack>
+using namespace std;
+class node{
+  public:
+  int data;
+  node *left,*right;
+  node(int data){
+    this->data=data;
+    this->left=nullptr;
+    this->right=nullptr;
+  }
+};
+void insert(node *&root,int num){
+    node *n=new node(num);
+    if(root==nullptr){
+        root=n;
+        return;
+    }
+    node *temp=root;
+    while(true){
+        if(temp->data>num && temp->left!=nullptr){
+            temp=temp->left;
+        }
+        else if(temp->data<num && temp->right!=nullptr){
+            temp=temp->right;
+        }
+        if(temp->data>num && temp->left==nullptr){
+            temp->left=n;
+            break;
+        }
+        if(temp->data<num && temp->right==nullptr){
+            temp->right=n;
+            break;
+        }
+    }
+}
+node *input(){
+  node *root=nullptr;
+  int num;
+    while(1){
+        cout<<"Enter the number you want to insert in bst or enter -1 to exit: ";
+        cin>>num;
+        if(num==-1){break;}
+        insert(root,num);
+    }
+    return root;
+}
+void preorder_rec(node *root){
+  if(root==nullptr){
+    return;
+  }
+  cout<<root->data<<" ";
+  preorder_rec(root->left);
+  preorder_rec(root->right);
+}
+void inorder_rec(node *root){
+  if(root==nullptr){
+    return;
+  }
+  inorder_rec(root->left);
+  cout<<root->data<<" ";
+  inorder_rec(root->right);
+}
+void postorder_rec(node *root){
+  if(root==nullptr){
+    return;
+  }
+  postorder_rec(root->left);
+  postorder_rec(root->right);
+  cout<<root->data<<" ";
+}
+void preorder_itr(node *root){
+  stack<node*> s;
+  s.push(root);
+  while(!s.empty()){
+    node *front=s.top();
+    cout<<front->data<<" ";
+    s.pop();
+    if(front->right!=nullptr){
+      s.push(front->right);
+    }
+    if(front->left!=nullptr){
+      s.push(front->left);
+    }
+  } 
+  cout<<endl;
+}
+void inorder_itr(node *root){
+  stack<node*> s;
+  s.push(root);
+  node *temp=root->left;
+  while(!s.empty() || temp!=nullptr){
+    while(temp!=nullptr){
+      s.push(temp);
+      temp=temp->left;
+    }
+    if(temp==nullptr){
+      cout<<s.top()->data<<" ";
+      temp=s.top()->right;
+      s.pop();
+    }
+  }
+}
+void postorder_itr(node *root){
+  stack<node*> s1;
+  stack<node*> s2;
+  s1.push(root);
+  while(!s1.empty()){
+    node *front=s1.top();
+    s2.push(front);
+    s1.pop();
+    if(front->left!=nullptr){
+      s1.push(front->left);
+    }
+    if(front->right!=nullptr){
+      s1.push(front->right);
+    }
+  }
+  while(!s2.empty()){
+    cout<<s2.top()->data<<" ";
+    s2.pop();
+  }
+}
+void level_order(node *root){
+  queue<node*> q;
+  q.push(root);
+  q.push(nullptr);
+  while(!q.empty()){
+    node *front=q.front();
+    q.pop();
+    if(front==nullptr){
+      cout<<endl;
+      if(!q.empty()){
+        q.push(nullptr);
+      }
+    }
+    else{
+      cout<<front->data<<" ";
+      if(front->left!=nullptr){
+        q.push(front->left);
+      }
+      if(front->right!=nullptr){
+        q.push(front->right);
+      }
+    }
+  }
+}
+node *create_clone(node *root){
+  if(root==nullptr){
+    return nullptr;
+  }
+  node *ans=new node(root->data);
+  ans->left=create_clone(root->left);
+  ans->right=create_clone(root->right);
+  return ans;
+}
+node *create_mirror(node *root){
+  if(root==nullptr){
+    return nullptr;
+  }
+  node *ans=new node(root->data);
+  ans->right=create_mirror(root->left);
+  ans->left=create_mirror(root->right);
+  return ans;
+}
+int height(node *root,int x){
+  if(root==nullptr){
+    return x;
+  }
+  int a=height(root->left,x+1);
+  int b=height(root->right,x+1);
+  return max(a,b);
+}
+node *create_from_pre_in_traversal(int *pre,int *in,int s,int e,int &index,int size){
+  if(s>e|| index>=size){
+    return nullptr;
+  }
+  node *root=new node(pre[index++]);
+  int i;
+  for(i=s;i<=e;i++){
+    if(in[i]==root->data){
+      break;
+    }
+  }
+  root->left=create_from_pre_in_traversal(pre,in,s,i-1,index,size);
+  root->right=create_from_pre_in_traversal(pre,in,i+1,e,index,size);
+  return root;
+}
+node *find_min(node *root){
+    while(root->left!=nullptr){
+        root=root->left;
+    }
+    return root;
+}
+node *dlt(node *root,int num){
+    if(root==nullptr){
+        return root;
+    }
+    if(root->data==num){
+        if(root->left==nullptr && root->right==nullptr){
+            root=nullptr;
+            return nullptr;
+        }
+        else if(root->left==nullptr && root->right !=nullptr){
+            node *temp=root->right;
+            delete root;
+            return temp;
+        }
+        else if(root->left!=nullptr && root->right==nullptr){
+            node *temp=root->left;
+            delete root;
+            return temp;
+        }
+        else{
+            int min=find_min(root->right)->data;
+            root->data=min;
+            root->right=dlt(root->right,min);
+            return root;
+        }
+    }
+    if(root->data>num){
+        root->left=dlt(root->left,num);
+    }
+    else{
+        root->right=dlt(root->right,num);
+    }
+}
+int main(){
+  node *root=nullptr;
+   int choice;
+  while(true){
+    cout<<"-------MENU-------"<<endl;
+    cout<<"1.Create a binary tree."<<endl;
+    cout<<"2.Print Preorder traversal of the tree."<<endl;
+    cout<<"3.Print Inorder traversal of the tree."<<endl;
+    cout<<"4.Print Postorder traversal of the tree."<<endl;
+    cout<<"5.Print Level order traversal of the tree."<<endl;
+    cout<<"6.Create clone image of the tree."<<endl;
+    cout<<"7.Create mirror image of the tree."<<endl;
+    cout<<"8.Find the height of the tree."<<endl;
+    cout<<"9.Create tree from inorder and preorder traversal."<<endl;
+    cout<<"10.Delete a node."<<endl;
+    cout<<"11.Exit"<<endl;
+    cout<<endl<<"Enter your choice : ";
+    cin>>choice;
+    if(choice==1){
+        root=input();
+    }
+    else if(choice==2){
+      cout<<"Recursive Preorder Traversal : ";
+      preorder_rec(root);
+      cout<<endl;
+      cout<<"Iterative Preorder Traversal : ";
+      preorder_itr(root);
+      cout<<endl;
+    }
+    else if(choice==3){
+      cout<<"Recursive Inorder Traversal : ";
+      inorder_rec(root);
+      cout<<endl;
+      cout<<"Iterative Inorder Traversal : ";
+      inorder_itr(root);
+      cout<<endl;
+    }
+    else if(choice==4){
+      cout<<"Recursive Postorder Traversal : ";
+      postorder_rec(root);
+      cout<<endl;
+      cout<<"Iterative Postorder Traversal : ";
+      postorder_itr(root);
+      cout<<endl;
+    }
+    else if(choice==5){
+      cout<<"Level order traversal : "<<endl;
+      level_order(root);
+      cout<<endl;
+    }
+    else if(choice==6){
+      node *clone=create_clone(root);
+      cout<<"Preorder traversal of clone : ";
+      preorder_rec(clone);
+      cout<<endl;
+      cout<<"Inorder traversal of clone : ";
+      inorder_itr(clone);
+      cout<<endl;
+      cout<<"Postoder traversal of clone : ";
+      postorder_itr(clone);
+      cout<<endl;
+      cout<<"Level order traversal of clone : "<<endl;
+      level_order(clone);
+      cout<<endl;
+    }
+    else if(choice==7){
+      node *mirror=create_mirror(root);
+      cout<<"Preorder traversal of mirror : ";
+      preorder_rec(mirror);
+      cout<<endl;
+      cout<<"Inorder traversal of mirror : ";
+      inorder_itr(mirror);
+      cout<<endl;
+      cout<<"Postoder traversal of mirror : ";
+      postorder_itr(mirror);
+      cout<<endl;
+      cout<<"Level order traversal of mirror : "<<endl;
+      level_order(mirror);
+      cout<<endl;
+    }
+    else if(choice==8){
+      cout<<"Height of the tree is : "<<height(root,0)<<endl;
+    }
+    else if(choice==9){
+      int num;
+      cout<<"Enter the number of nodes in the tree : ";
+      cin>>num;
+      int *pre=new int[num];
+      int *in=new int[num];
+      cout<<"Enter the preorder traversal of the tree : "<<endl;
+      for(int i=0;i<num;i++){
+        cin>>pre[i];
+      }
+      cout<<"Enter the inorder traversal of the tree : "<<endl;
+      for(int i=0;i<num;i++){
+        cin>>in[i];
+      }
+      int x=0;
+      node *ans=create_from_pre_in_traversal(pre,in,0,num-1,x,num);
+      cout<<"Postoder traversal of created tree : ";
+      postorder_itr(ans);
+      cout<<endl;
+      cout<<"Level order traversal of created tree : "<<endl;
+      level_order(ans);
+      cout<<endl;
+    }
+    else if(choice==10){
+      int num;
+      while(true){
+        cout<<"Enter the node you want to delete or enter -1 to exit:  ";
+        cin>>num;
+        if(num==-1){
+          break;
+        }
+        dlt(root,num);
+        cout<<"Level order traversal after deletion : "<<endl;
+        level_order(root);
+      }
+    }
+    else{
+      break;
+    }
+  }
+  return 0;
+}
